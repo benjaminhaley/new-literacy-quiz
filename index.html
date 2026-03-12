@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New Literacies Parent Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    background: #1a1a2e;
+    color: #e8e6e1;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  .container { max-width: 600px; margin: 0 auto; padding: 40px 20px 60px; }
+
+  /* Header / Brand */
+  .brand { margin-bottom: 32px; }
+  .brand-name { font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
+  .brand-name span:first-child { color: #a8a29e; font-weight: 400; }
+  .brand-name span:last-child { color: #fff; }
+
+  h1 { font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 8px; letter-spacing: -0.02em; }
+  .subtitle { color: #a8a29e; margin-bottom: 32px; font-size: 0.95rem; }
+
+  /* Cards */
+  .card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+    backdrop-filter: blur(10px);
+  }
+  .card h2 { font-size: 1.15rem; color: #fff; margin-bottom: 6px; font-weight: 600; }
+
+  /* Age band buttons */
+  .age-bands { display: flex; gap: 12px; margin: 20px 0; }
+  .age-band-btn {
+    flex: 1;
+    padding: 16px 12px;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.12);
+    background: transparent;
+    color: #e8e6e1;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .age-band-btn:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); }
+  .age-band-btn.selected { border-color: #34d399; background: rgba(52,211,153,0.1); color: #34d399; }
+  .age-band-btn .age-range { font-size: 1.3rem; font-weight: 700; display: block; margin-bottom: 2px; }
+  .age-band-btn .age-label { font-size: 0.75rem; color: #a8a29e; display: block; }
+  .age-band-btn.selected .age-label { color: #6ee7b7; }
+
+  /* Submit / Next */
+  button.submit {
+    display: block; width: 100%; padding: 14px;
+    font-size: 1rem; font-weight: 600; font-family: inherit;
+    color: #1a1a2e; background: #34d399;
+    border: none; border-radius: 12px; cursor: pointer; margin-top: 20px;
+    transition: background 0.2s;
+  }
+  button.submit:hover { background: #6ee7b7; }
+  button.submit:disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); cursor: not-allowed; }
+
+  /* Progress */
+  .progress-bar { height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-bottom: 24px; }
+  .progress-fill { height: 100%; background: #34d399; border-radius: 2px; transition: width 0.3s; }
+  .step-counter { font-size: 0.8rem; color: #78716c; margin-bottom: 6px; }
+
+  /* Question activity tip */
+  .activity-tip {
+    background: rgba(52,211,153,0.08);
+    border-left: 3px solid #34d399;
+    border-radius: 0 10px 10px 0;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #d6d3d1;
+    line-height: 1.5;
+  }
+
+  /* Options */
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .options label {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    cursor: pointer; font-size: 0.9rem;
+    transition: all 0.15s;
+    color: #d6d3d1;
+  }
+  .options label:hover { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.03); }
+  .options input[type="radio"] {
+    margin-top: 3px; flex-shrink: 0;
+    accent-color: #34d399;
+  }
+  .options input[type="radio"]:checked + span { color: #fff; font-weight: 500; }
+  .options label:has(input:checked) { border-color: #34d399; background: rgba(52,211,153,0.08); }
+
+  /* Results */
+  .results { display: none; }
+  .overall {
+    font-size: 2rem; font-weight: 700; text-align: center; padding: 20px 0 8px;
+    color: #fff;
+  }
+  .overall-sub { text-align: center; color: #a8a29e; font-size: 0.9rem; padding-bottom: 8px; }
+
+  .result-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .result-row:last-child { border-bottom: none; }
+  .result-label { font-weight: 600; color: #fff; font-size: 0.95rem; }
+  .result-tagline { font-size: 0.8rem; color: #78716c; }
+  .result-right { text-align: right; }
+  .result-status { display: flex; align-items: center; gap: 6px; justify-content: flex-end; font-size: 0.85rem; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .dot-green { background: #34d399; }
+  .dot-orange { background: #f59e0b; }
+  .dot-red { background: #ef4444; }
+  .result-link { font-size: 0.8rem; color: #34d399; text-decoration: none; }
+  .result-link:hover { text-decoration: underline; }
+
+  /* Email CTA */
+  .email-cta { text-align: center; }
+  .email-cta h3 { color: #fff; font-size: 1rem; margin-bottom: 6px; }
+  .email-cta p { color: #a8a29e; font-size: 0.85rem; margin-bottom: 14px; }
+  .email-form { display: flex; gap: 8px; }
+  .email-form input[type="email"] {
+    flex: 1; padding: 10px 14px; border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06);
+    color: #fff; font-family: inherit; font-size: 0.9rem;
+    outline: none;
+  }
+  .email-form input[type="email"]::placeholder { color: #78716c; }
+  .email-form input[type="email"]:focus { border-color: #34d399; }
+  .email-form button {
+    padding: 10px 20px; border-radius: 10px; border: none;
+    background: #34d399; color: #1a1a2e; font-family: inherit;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    white-space: nowrap;
+  }
+  .email-form button:hover { background: #6ee7b7; }
+  .email-success { color: #34d399; font-size: 0.9rem; display: none; margin-top: 10px; }
+
+  .restart { text-align: center; margin-top: 20px; }
+  .restart a { color: #a8a29e; cursor: pointer; text-decoration: underline; font-size: 0.85rem; }
+  .restart a:hover { color: #fff; }
+
+  #quiz-section { display: none; }
+
+  @media (max-width: 480px) {
+    .age-bands { flex-direction: column; }
+    .email-form { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-name"><span>new</span><span>literacies</span></div>
+  </div>
+
+  <!-- Age Selection -->
+  <div id="age-section">
+    <h1>How are you preparing your child for the AI age?</h1>
+    <p class="subtitle">A quick quiz based on 100+ research papers about the 8 capacities kids need to thrive.</p>
+    <div class="card">
+      <h2>What's your child's age range?</h2>
+      <p style="color:#a8a29e; font-size:0.85rem; margin-bottom:4px;">If you have multiple children, pick one to focus on.</p>
+      <div class="age-bands">
+        <button class="age-band-btn" onclick="selectAge(this, '3-7')">
+          <span class="age-range">3 – 7</span>
+          <span class="age-label">Early childhood</span>
+        </button>
+        <button class="age-band-btn" onclick="selectAge(this, '8-12')">
+          <span class="age-range">8 – 12</span>
+          <span class="age-label">Middle childhood</span>
+        </button>
+        <button class="age-band-btn" onclick="selectAge(this, '13+')">
+          <span class="age-range">13 +</span>
+          <span class="age-label">Teens</span>
+        </button>
+      </div>
+      <button class="submit" id="start-btn" onclick="startQuiz()" disabled>Start Quiz</button>
+    </div>
+  </div>
+
+  <!-- Quiz Questions -->
+  <div id="quiz-section">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div id="question-container"></div>
+    <button class="submit" id="next-btn" onclick="nextQuestion()" disabled>Next</button>
+  </div>
+
+  <!-- Results -->
+  <div id="results-section" class="results">
+    <h1>Your Results</h1>
+    <p class="subtitle" id="results-subtitle"></p>
+    <div class="card">
+      <div class="overall" id="overall-score"></div>
+      <div class="overall-sub" id="overall-sub"></div>
+    </div>
+    <div class="card" id="results-list"></div>
+    <div class="card email-cta">
+      <h3>Want regular tips like these?</h3>
+      <p>Get research-backed New Literacy tips delivered to your inbox.</p>
+      <div class="email-form" id="email-form">
+        <input type="email" id="email-input" placeholder="you@example.com">
+        <button onclick="submitEmail()">Subscribe</button>
+      </div>
+      <div class="email-success" id="email-success">Thanks! We'll be in touch.</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <p style="color:#a8a29e; margin-bottom:6px; font-size:0.85rem;">Explore all 8 capacities in depth</p>
+      <a href="https://newliteracies.ai/explore" target="_blank" style="color:#34d399; font-weight:600; text-decoration:none;">newliteracies.ai/explore &rarr;</a>
+    </div>
+    <div class="restart"><a onclick="location.reload()">Take the quiz again</a></div>
+  </div>
+
+</div>
+
+<script>
+const DATA = {
+  agency: {
+    name: "Agency",
+    tagline: "Can I start?",
+    url: "https://newliteracies.ai/explore/agency",
+    question: {
+      "3-7": "When it comes to everyday decisions, how much choice does your child get?",
+      "8-12": "How do you handle your child's responsibilities like homework and chores?",
+      "13+": "How much control does your teen have over real life decisions?"
+    },
+    tip: {
+      "3-7": "Research shows that offering real choices — even small ones like which shirt to wear — builds the \"I am someone who decides\" muscle early on.",
+      "8-12": "Instead of asking \"Did you finish your homework?\" try \"What's your plan for getting it done?\" — shifting from manager to consultant builds agency.",
+      "13+": "Gradually handing over control of real domains — spending, curfew, academic decisions — means by 18 they'll be ready to manage their own life."
+    },
+    options: {
+      "3-7": [
+        { text: "I regularly offer real choices and honor what they pick", score: 3 },
+        { text: "I sometimes offer choices, but often default to deciding for them", score: 2 },
+        { text: "I mostly make decisions for my child to keep things running smoothly", score: 1 },
+        { text: "I haven't really thought about giving choices at this age", score: 0 }
+      ],
+      "8-12": [
+        { text: "I ask about their plans and let them manage their own tasks", score: 3 },
+        { text: "I check in but still direct most of their activities", score: 2 },
+        { text: "I manage their schedule and tasks pretty closely", score: 1 },
+        { text: "I mostly handle it all — it's easier that way", score: 0 }
+      ],
+      "13+": [
+        { text: "I'm actively handing over control of real domains like money, schedule, and decisions", score: 3 },
+        { text: "They have some autonomy but I still make most of the big calls", score: 2 },
+        { text: "I manage most things — they'll figure it out later", score: 1 },
+        { text: "I haven't started this transition yet", score: 0 }
+      ]
+    }
+  },
+  persistence: {
+    name: "Persistence",
+    tagline: "Can I keep going?",
+    url: "https://newliteracies.ai/explore/persistence",
+    question: {
+      "3-7": "When your child gets frustrated with something hard, what do you do?",
+      "8-12": "How does your child handle difficulty and setbacks?",
+      "13+": "When your teen faces failure, how do you respond?"
+    },
+    tip: {
+      "3-7": "Try the \"Struggle Window\" — when your child is frustrated, count to 30 before helping. If they haven't quit, they're building tolerance for difficulty.",
+      "8-12": "Practicing effort self-talk like \"This is hard but I can try\" during low-stakes challenges gives kids ready-made scripts for when real difficulty hits.",
+      "13+": "After failures, try an \"effort autopsy\": \"Walk me through what you tried. Where did it get hard? What would you do differently?\" This keeps the effort-learning connection alive."
+    },
+    options: {
+      "3-7": [
+        { text: "I pause before helping and let them work through the frustration", score: 3 },
+        { text: "I try to wait, but usually step in pretty quickly", score: 2 },
+        { text: "I help right away — I don't want them to get upset", score: 1 },
+        { text: "I haven't thought much about letting them struggle", score: 0 }
+      ],
+      "8-12": [
+        { text: "We actively practice positive self-talk and effort strategies", score: 3 },
+        { text: "I encourage them but haven't taught specific strategies", score: 2 },
+        { text: "I mostly focus on the outcome, not the effort process", score: 1 },
+        { text: "We haven't really worked on this", score: 0 }
+      ],
+      "13+": [
+        { text: "We regularly debrief failures together without judgment", score: 3 },
+        { text: "I sometimes ask what happened, but it can feel like criticism", score: 2 },
+        { text: "I tend to focus on preventing failure rather than learning from it", score: 1 },
+        { text: "We don't really discuss failures", score: 0 }
+      ]
+    }
+  },
+  adaptability: {
+    name: "Adaptability",
+    tagline: "Can I change course?",
+    url: "https://newliteracies.ai/explore/adaptability",
+    question: {
+      "3-7": "Do you help your child practice predicting and comparing outcomes?",
+      "8-12": "How does your child approach learning and studying?",
+      "13+": "Does your teen reflect on how they learn best?"
+    },
+    tip: {
+      "3-7": "Before reading a book or doing an activity, ask what they think will happen — then compare afterward. This builds the prediction-error loop that drives learning.",
+      "8-12": "Instead of \"read over your notes again,\" try \"Close your notes. What do you remember?\" The retrieval is the learning, not the review.",
+      "13+": "A \"Learning Log\" — brief records of what they studied, how, and how they performed — reveals patterns like \"I do better when I spread practice out.\""
+    },
+    options: {
+      "3-7": [
+        { text: "We regularly make predictions and compare them to what happens", score: 3 },
+        { text: "I sometimes ask what they think will happen", score: 2 },
+        { text: "I usually just explain what's going to happen", score: 1 },
+        { text: "I haven't tried prediction games", score: 0 }
+      ],
+      "8-12": [
+        { text: "My child practices active recall and self-testing regularly", score: 3 },
+        { text: "I encourage studying but don't guide specific methods", score: 2 },
+        { text: "They mostly re-read notes or materials", score: 1 },
+        { text: "I haven't thought about teaching study strategies", score: 0 }
+      ],
+      "13+": [
+        { text: "They track their learning strategies and reflect on what works", score: 3 },
+        { text: "They have some awareness of their study habits", score: 2 },
+        { text: "They mostly just do homework without reflecting on how they learn", score: 1 },
+        { text: "We haven't talked about this", score: 0 }
+      ]
+    }
+  },
+  curiosity: {
+    name: "Curiosity",
+    tagline: "Do I want to explore?",
+    url: "https://newliteracies.ai/explore/curiosity",
+    question: {
+      "3-7": "When your child asks you a question, how do you typically respond?",
+      "8-12": "How do you handle explaining things to your child?",
+      "13+": "How does your teen explore new interests?"
+    },
+    tip: {
+      "3-7": "When kids ask questions, try returning them first — \"Why do you think the sky is blue?\" This engages their reasoning and shows their thinking matters.",
+      "8-12": "Try leaving intentional gaps when explaining things — \"There are three reasons… I'll tell you two. Can you figure out the third?\" Gaps trigger deeper inquiry.",
+      "13+": "Start from their existing passion and build bridges to connected domains. A teen into gaming might discover game design, then programming, then psychology of motivation."
+    },
+    options: {
+      "3-7": [
+        { text: "I regularly turn their questions back to them first", score: 3 },
+        { text: "I sometimes ask what they think, but usually just answer", score: 2 },
+        { text: "I give quick answers so they learn the right thing", score: 1 },
+        { text: "I hadn't considered returning questions to them", score: 0 }
+      ],
+      "8-12": [
+        { text: "I deliberately leave gaps and invite them to figure things out", score: 3 },
+        { text: "I try to explain things thoroughly so they understand", score: 2 },
+        { text: "I mostly let school handle the teaching", score: 1 },
+        { text: "I haven't thought about this approach", score: 0 }
+      ],
+      "13+": [
+        { text: "I help them connect their interests to broader domains and ideas", score: 3 },
+        { text: "I support their interests but don't actively bridge to new ones", score: 2 },
+        { text: "Their interests seem narrow but I'm not sure how to broaden them", score: 1 },
+        { text: "I haven't tried connecting their passions to new areas", score: 0 }
+      ]
+    }
+  },
+  creativity: {
+    name: "Creativity",
+    tagline: "Can I make something new?",
+    url: "https://newliteracies.ai/explore/creativity",
+    question: {
+      "3-7": "How much unstructured, screen-free play does your child get?",
+      "8-12": "How does your child handle the creative process?",
+      "13+": "Does your teen finish creative projects?"
+    },
+    tip: {
+      "3-7": "30–60 minutes daily of unstructured play with open-ended materials (blocks, clay, blank paper) — no screens, no \"right\" way — is a powerful creativity builder.",
+      "8-12": "When kids get self-critical, try saying \"Your first version is supposed to be rough — that's not failure, that's the process.\" Separating creating from editing is key.",
+      "13+": "Help them finish creative projects even imperfectly. A mediocre finished song teaches more about craft than an abandoned masterpiece."
+    },
+    options: {
+      "3-7": [
+        { text: "They get daily unstructured, screen-free creative time", score: 3 },
+        { text: "They have some unstructured time, but it's not every day", score: 2 },
+        { text: "Most of their time is structured activities or screens", score: 1 },
+        { text: "I haven't prioritized unstructured play", score: 0 }
+      ],
+      "8-12": [
+        { text: "I actively encourage rough first drafts and separate creating from editing", score: 3 },
+        { text: "I try to be supportive but they're pretty self-critical", score: 2 },
+        { text: "I tend to focus on quality of the finished product", score: 1 },
+        { text: "I haven't thought about separating creation from revision", score: 0 }
+      ],
+      "13+": [
+        { text: "I help them finish creative projects, even when imperfect", score: 3 },
+        { text: "They start projects but often abandon them", score: 2 },
+        { text: "Creative projects aren't really a priority right now", score: 1 },
+        { text: "I haven't focused on this", score: 0 }
+      ]
+    }
+  },
+  judgment: {
+    name: "Judgment",
+    tagline: "Can I decide well?",
+    url: "https://newliteracies.ai/explore/judgment",
+    question: {
+      "3-7": "How does your child learn about consequences?",
+      "8-12": "Does your child have a way to think through decisions?",
+      "13+": "Can your teen critically evaluate what they see online and from AI?"
+    },
+    tip: {
+      "3-7": "When the stakes are low, let them experience natural consequences — no jacket means cold at the park. This builds the feedback loop between decisions and outcomes.",
+      "8-12": "Try the WRAP framework together: Widen your options, Reality-test assumptions, Attain distance (\"What would you tell a friend?\"), Prepare to be wrong.",
+      "13+": "Have them evaluate AI output on a topic they know well — \"Where is it accurate? Where is it wrong? How would you know if you didn't already know?\""
+    },
+    options: {
+      "3-7": [
+        { text: "I let them experience natural consequences when stakes are low", score: 3 },
+        { text: "I sometimes let consequences happen but often protect them", score: 2 },
+        { text: "I try to prevent bad outcomes before they happen", score: 1 },
+        { text: "I haven't thought about using natural consequences", score: 0 }
+      ],
+      "8-12": [
+        { text: "We use structured ways to think through real decisions together", score: 3 },
+        { text: "I talk through decisions with them but without a specific process", score: 2 },
+        { text: "I mostly make the important decisions for them", score: 1 },
+        { text: "I haven't taught decision-making frameworks", score: 0 }
+      ],
+      "13+": [
+        { text: "They critically evaluate AI and media — we practice this together", score: 3 },
+        { text: "I've talked about being skeptical of AI but we haven't practiced", score: 2 },
+        { text: "They mostly trust what they read online", score: 1 },
+        { text: "We haven't discussed evaluating AI output", score: 0 }
+      ]
+    }
+  },
+  connection: {
+    name: "Connection",
+    tagline: "Can I relate to others?",
+    url: "https://newliteracies.ai/explore/connection",
+    question: {
+      "3-7": "How do you engage with your child during everyday moments?",
+      "8-12": "Do you and your child have dedicated one-on-one time?",
+      "13+": "When your teen comes to you with a problem, what happens?"
+    },
+    tip: {
+      "3-7": "\"Serve and Return\" — when your child looks at something, follow their gaze and comment. When they babble, respond as if it's meaningful. Thousands of small attuned returns build the brain architecture for relationship.",
+      "8-12": "10–15 minutes daily of child-directed, one-on-one time — they choose the activity, you follow their lead without directing or correcting. Just presence.",
+      "13+": "When teens share problems, resist the urge to fix. Try saying \"That sounds really hard,\" then wait. They need to be heard more than helped."
+    },
+    options: {
+      "3-7": [
+        { text: "I consistently follow their lead and respond to their cues throughout the day", score: 3 },
+        { text: "I try to be attentive but I'm often multitasking", score: 2 },
+        { text: "I respond when they need something but don't actively follow their cues", score: 1 },
+        { text: "I haven't thought much about this kind of interaction", score: 0 }
+      ],
+      "8-12": [
+        { text: "We have regular one-on-one time where they lead the activity", score: 3 },
+        { text: "We spend time together but I usually choose what we do", score: 2 },
+        { text: "We're mostly together during tasks like homework, meals, and errands", score: 1 },
+        { text: "I haven't set up dedicated one-on-one time", score: 0 }
+      ],
+      "13+": [
+        { text: "I listen without jumping to fix — they come to me and I let them talk", score: 3 },
+        { text: "I try to listen but often end up giving advice", score: 2 },
+        { text: "They don't share much with me anymore", score: 1 },
+        { text: "I tend to jump straight to solutions", score: 0 }
+      ]
+    }
+  },
+  purpose: {
+    name: "Purpose",
+    tagline: "Who am I and why does it matter?",
+    url: "https://newliteracies.ai/explore/purpose",
+    question: {
+      "3-7": "Do you help your child notice and name their inner world?",
+      "8-12": "How broadly is your child exploring activities and interests?",
+      "13+": "Do you and your teen talk about meaning and what matters?"
+    },
+    tip: {
+      "3-7": "Try \"Preference Narration\" — say things like \"You really love that truck\" or \"You don't like loud noises, do you?\" This helps kids learn they have an inner life worth noticing.",
+      "8-12": "Offer an \"Identity Buffet\" — expose them to many activities without pushing early specialization. Purpose emerges through varied engagement; the goal at this age is sampling.",
+      "13+": "Ask open questions: \"What do you think you're here for? What would make a life well-lived?\" Creating space for existential questions — even when it feels awkward — matters."
+    },
+    options: {
+      "3-7": [
+        { text: "I regularly narrate their preferences and feelings back to them", score: 3 },
+        { text: "I sometimes comment on what they like, but not consistently", score: 2 },
+        { text: "I focus more on behavior than on naming their inner world", score: 1 },
+        { text: "I haven't thought about narrating their preferences", score: 0 }
+      ],
+      "8-12": [
+        { text: "I expose them to many activities and let them sample without pressure", score: 3 },
+        { text: "They do a few things but I'm wondering if they should pick one", score: 2 },
+        { text: "They're already focused on one or two things", score: 1 },
+        { text: "I haven't considered the value of broad exposure at this age", score: 0 }
+      ],
+      "13+": [
+        { text: "We have open conversations about meaning, values, and what matters to them", score: 3 },
+        { text: "I'd like to have these conversations but it feels awkward", score: 2 },
+        { text: "We mostly talk about school and logistics", score: 1 },
+        { text: "We haven't really gone there", score: 0 }
+      ]
+    }
+  }
+};
+
+let ageBand = "";
+let currentQ = 0;
+let answers = {};
+const catKeys = Object.keys(DATA);
+
+function selectAge(btn, band) {
+  document.querySelectorAll('.age-band-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  ageBand = band;
+  document.getElementById('start-btn').disabled = false;
+}
+
+function startQuiz() {
+  if (!ageBand) return;
+  currentQ = 0;
+  answers = {};
+  document.getElementById("age-section").style.display = "none";
+  document.getElementById("quiz-section").style.display = "block";
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const key = catKeys[currentQ];
+  const cat = DATA[key];
+  const opts = cat.options[ageBand];
+  const question = cat.question[ageBand];
+  const tip = cat.tip[ageBand];
+
+  document.getElementById("progress-fill").style.width = ((currentQ) / catKeys.length * 100) + "%";
+
+  const btn = document.getElementById("next-btn");
+  btn.disabled = true;
+  btn.textContent = currentQ === catKeys.length - 1 ? "See Results" : "Next";
+
+  let html = `
+    <div class="step-counter">Question ${currentQ + 1} of ${catKeys.length}</div>
+    <div class="card">
+      <h2>${question}</h2>
+      <div class="activity-tip">${tip}</div>
+      <div class="options">
+  `;
+  opts.forEach((opt, i) => {
+    html += `
+      <label>
+        <input type="radio" name="q${currentQ}" value="${opt.score}" onchange="document.getElementById('next-btn').disabled=false">
+        <span>${opt.text}</span>
+      </label>
+    `;
+  });
+  html += `</div></div>`;
+  document.getElementById("question-container").innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextQuestion() {
+  const selected = document.querySelector(`input[name="q${currentQ}"]:checked`);
+  if (!selected) return;
+  answers[catKeys[currentQ]] = parseInt(selected.value);
+  currentQ++;
+  if (currentQ >= catKeys.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById("quiz-section").style.display = "none";
+  const resultsSection = document.getElementById("results-section");
+  resultsSection.style.display = "block";
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  let total = 0;
+  let max = catKeys.length * 3;
+
+  // Build result items with scores for sorting
+  const items = catKeys.map(key => {
+    const cat = DATA[key];
+    const score = answers[key] || 0;
+    total += score;
+    return { key, cat, score };
+  });
+
+  // Sort: green (3) first, then orange (2), then red (0-1)
+  items.sort((a, b) => b.score - a.score);
+
+  let html = "";
+  items.forEach(({ cat, score }) => {
+    const dotClass = score >= 3 ? "dot-green" : score >= 2 ? "dot-orange" : "dot-red";
+    const label = score >= 3 ? "Strong" : score >= 2 ? "Growing" : score >= 1 ? "Developing" : "Not yet started";
+    const labelColor = score >= 3 ? "#34d399" : score >= 2 ? "#f59e0b" : "#ef4444";
+
+    html += `
+      <div class="result-row">
+        <div>
+          <div class="result-label">${cat.name}</div>
+          <div class="result-tagline">${cat.tagline}</div>
+        </div>
+        <div class="result-right">
+          <div class="result-status">
+            <span class="status-dot ${dotClass}"></span>
+            <span style="color:${labelColor}">${label}</span>
+          </div>
+          <a class="result-link" href="${cat.url}" target="_blank">Learn more &rarr;</a>
+        </div>
+      </div>
+    `;
+  });
+
+  const pctTotal = Math.round((total / max) * 100);
+  document.getElementById("overall-score").textContent = `${pctTotal}%`;
+  document.getElementById("overall-sub").textContent =
+    pctTotal >= 75 ? "You're doing great! Here's where you can go even deeper." :
+    pctTotal >= 50 ? "Solid foundation — a few areas to focus on." :
+    "Great that you're here! Lots of opportunity to grow.";
+  document.getElementById("results-list").innerHTML = html;
+}
+
+function submitEmail() {
+  const email = document.getElementById("email-input").value;
+  if (!email || !email.includes("@")) {
+    document.getElementById("email-input").style.borderColor = "#ef4444";
+    return;
+  }
+  // For now, just show success — wire up to a real endpoint later
+  document.getElementById("email-form").style.display = "none";
+  document.getElementById("email-success").style.display = "block";
+  console.log("Email submitted:", email, "Age band:", ageBand, "Scores:", answers);
+}
+</script>
+</body>
+</html>
